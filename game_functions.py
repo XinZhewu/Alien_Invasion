@@ -96,12 +96,9 @@ def check_fleet_edges(ai_settings, aliens):
 def check_high_score(stats, sb):
     """检查是否诞生了新的最高分"""
 
-    with open('highest.txt', 'r+') as hst:
-        highest = int(hst.read().rstrip())
-        if stats.score > highest:
-            highest = stats.score
-            hst.write(str(highest))
-            sb.prep_high_score()
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        sb.prep_high_score()
 
 
 def check_keydown_events(
@@ -120,7 +117,7 @@ def check_keydown_events(
     elif event.key == pygame.K_F4:
         sys.exit()
 
-    elif event.key == pygame.K_p and not stats.game_active:
+    elif event.key == pygame.K_p:
         start_game(ai_settings, stats, sb, aliens, bullets, screen, ship)
 
 
