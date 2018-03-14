@@ -69,7 +69,8 @@ def check_events(
             sys.exit()
 
         elif event.type == pygame.KEYDOWN:
-            check_keydown_events(event, ai_settings, screen, ship, bullets)
+            check_keydown_events(
+                event, ai_settings, screen, ship, bullets, stats, sb, aliens)
 
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, ship)
@@ -95,12 +96,16 @@ def check_fleet_edges(ai_settings, aliens):
 def check_high_score(stats, sb):
     """检查是否诞生了新的最高分"""
 
-    if stats.score > stats.high_score:
-        stats.high_score = stats.score
-        sb.prep_high_score()
+    with open('highest.txt', 'r+') as hst:
+        highest = int(hst.read().rstrip())
+        if stats.score > highest:
+            highest = stats.score
+            hst.write(str(highest))
+            sb.prep_high_score()
 
 
-def check_keydown_events(event, ai_settings, screen, ship, bullets):
+def check_keydown_events(
+        event, ai_settings, screen, ship, bullets, stats, sb, aliens):
     """附属于check_events()"""
 
     if event.key == pygame.K_RIGHT:
@@ -115,6 +120,9 @@ def check_keydown_events(event, ai_settings, screen, ship, bullets):
     elif event.key == pygame.K_F4:
         sys.exit()
 
+    elif event.key == pygame.K_p and not stats.game_active:
+        start_game(ai_settings, stats, sb, aliens, bullets, screen, ship)
+
 
 def check_keyup_events(event, ship):
     """附属于check_events()"""
@@ -124,6 +132,34 @@ def check_keyup_events(event, ship):
 
     elif event.key == pygame.K_LEFT:
         ship.moving_left = False
+
+
+def start_game(ai_settings, stats, sb, aliens, bullets, screen, ship):
+    """使游戏开始"""
+
+    # 重置游戏设置
+    ai_settings.initialize_dynamic_settings()
+
+    # 隐藏光标
+    pygame.mouse.set_visible(False)
+
+    # 重置游戏统计信息
+    stats.reset_stats()
+    stats.game_active = True
+
+    # 重置记分牌图像
+    sb.prep_score()
+    sb.prep_high_score()
+    sb.prep_level()
+    sb.prep_ships()
+
+    # 清空外星人`子弹列表
+    aliens.empty()
+    bullets.empty()
+
+    # 创建新外星人群,飞船居中
+    create_fleet(ai_settings, screen, ship, aliens)
+    ship.center_ship()
 
 
 def check_play_button(
@@ -136,30 +172,7 @@ def check_play_button(
 
     # 当玩家点击Play按钮且游戏处于非活动状态时,游戏才重新开始
     if button_clicked and not stats.game_active:
-
-        # 重置游戏设置
-        ai_settings.initialize_dynamic_settings()
-
-        # 隐藏光标
-        pygame.mouse.set_visible(False)
-
-        # 重置游戏统计信息
-        stats.reset_stats()
-        stats.game_active = True
-
-        # 重置记分牌图像
-        sb.prep_score()
-        sb.prep_high_score()
-        sb.prep_level()
-        sb.prep_ships()
-
-        # 清空外星人`子弹列表
-        aliens.empty()
-        bullets.empty()
-
-        # 创建新外星人群,飞船居中
-        create_fleet(ai_settings, screen, ship, aliens)
-        ship.center_ship()
+        start_game(ai_settings, stats, sb, aliens, bullets, screen, ship)
 
 
 def create_alien(ai_settings, screen, aliens, alien_number, row_number):
