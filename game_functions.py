@@ -65,7 +65,7 @@ def check_events(
     for event in pygame.event.get():
 
         if event.type == pygame.QUIT:
-            # save_high_score()
+            contrast_high_score(stats)
             sys.exit()
 
         elif event.type == pygame.KEYDOWN:
@@ -93,10 +93,28 @@ def check_fleet_edges(ai_settings, aliens):
             break
 
 
+def contrast_high_score(stats):
+    """游戏分数大于历史最高分则进行更新"""
+
+    with open('highest.txt') as hst:
+        highest = hst.read()
+        if stats.score > int(highest):
+            save_high_score(stats)
+
+
+def save_high_score(stats):
+    """保存分数"""
+
+    with open('highest.txt', 'w') as hst:
+        hst.write(str(stats.score))
+
+
 def check_high_score(stats, sb):
     """检查是否诞生了新的最高分"""
 
-    if stats.score > stats.high_score:
+    with open('highest.txt') as hst:
+        highest = int(hst.read())
+    if stats.score > highest:
         stats.high_score = stats.score
         sb.prep_high_score()
 
@@ -115,9 +133,11 @@ def check_keydown_events(
         fire_bullet(ai_settings, screen, ship, bullets)
 
     elif event.key == pygame.K_F4:
+        contrast_high_score(stats)
         sys.exit()
 
     elif event.key == pygame.K_p:
+        contrast_high_score(stats)
         start_game(ai_settings, stats, sb, aliens, bullets, screen, ship)
 
 
@@ -169,6 +189,7 @@ def check_play_button(
 
     # 当玩家点击Play按钮且游戏处于非活动状态时,游戏才重新开始
     if button_clicked and not stats.game_active:
+        contrast_high_score(stats)
         start_game(ai_settings, stats, sb, aliens, bullets, screen, ship)
 
 

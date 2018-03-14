@@ -23,7 +23,9 @@ class GameStats:
         self.game_active = False
 
         # 任何情况下都不重置的游戏历史最高分
-        self.high_score = 0
+        with open('highest.txt') as hst:
+            highest = int(hst.read())
+            self.high_score = highest
 
     def reset_stats(self):
         """初始化游戏运行期间可能变化的统计信息"""
