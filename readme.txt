@@ -1,1 +1,0 @@
-一个致敬Space Invaders的迷你游戏。
