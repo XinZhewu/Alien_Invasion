@@ -1,5 +1,5 @@
 # Alien_Invasion
-**From Python Crash Course.**  
+**From *Python Crash Course*.**  
 **一个致敬Space Invaders的迷你游戏。**  
 
 ## 修改日志
